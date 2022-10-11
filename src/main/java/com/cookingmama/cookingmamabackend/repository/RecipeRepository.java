@@ -12,6 +12,6 @@ import com.cookingmama.cookingmamabackend.model.RecipeModel;
 @CrossOrigin(origins = "http://localhost:8081")
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     List<RecipeModel> findByName(String name);
-    List<RecipeModel> findByUserId(long id);
+    List<RecipeModel> findByUserid(long userid);
 }
 

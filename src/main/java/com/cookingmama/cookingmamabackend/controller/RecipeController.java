@@ -18,7 +18,7 @@ public class RecipeController {
 
     @GetMapping({"","/","/index"})
     public JsonNode index() throws JsonParseException, IOException {
-        String indexString = "{\"pesan\":\"Welcome to Coocing Mama Backend Service\"}";
+        String indexString = "{\"pesan\":\"Welcome to Cooking Mama Backend Service\"}";
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode welcome = mapper.readTree(indexString);
