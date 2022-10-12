@@ -8,6 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.cookingmama.cookingmamabackend.model.RecipeModel;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @CrossOrigin(origins = "http://localhost:8081")
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
