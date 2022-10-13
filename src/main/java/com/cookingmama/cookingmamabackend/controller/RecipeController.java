@@ -65,11 +65,11 @@ public class RecipeController {
         }
     }
 
-    @PostMapping(value = "/resep/create")
-    public RecipeModel postRecipe(@RequestBody RecipeModel recipeModel){
-        RecipeModel _resipeModel = RecipeRepository.save(new RecipeModel(recipeModel.getId(), recipeModel.getHowto(), recipeModel.getIngredients(), recipeModel.getName(), recipeModel.getPublik(), recipeModel.getUserid()));
-        return _resipeModel;
-    }
+//    @PostMapping(value = "/resep/create")
+//    public RecipeModel postRecipe(@RequestBody RecipeModel recipeModel){
+//        RecipeModel _resipeModel = RecipeRepository.save(new RecipeModel(recipeModel.getId(), recipeModel.getHowto(), recipeModel.getIngredients(), recipeModel.getName(), recipeModel.getPublik(), recipeModel.getUserid()));
+//        return _resipeModel;
+//    }
 
     //delete resep by id
     @DeleteMapping("/resep/{id}")
