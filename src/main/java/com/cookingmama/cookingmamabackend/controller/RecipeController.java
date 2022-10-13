@@ -65,4 +65,36 @@ public class RecipeController {
         }
     }
 
+    @PostMapping(value = "/resep/create")
+    public RecipeModel postRecipe(@RequestBody RecipeModel recipeModel){
+        RecipeModel _resipeModel = RecipeRepository.save(new RecipeModel(recipeModel.getId(), recipeModel.getHowto(), recipeModel.getIngredients(), recipeModel.getName(), recipeModel.getPublik(), recipeModel.getUserid()));
+        return _resipeModel;
+    }
+
+    //delete resep by id
+    @DeleteMapping("/resep/{id}")
+    public ResponseEntity<String> deleteRecipe(@PathVariable("id")long id){
+        RecipeRepository.deleteById(id);
+        return new ResponseEntity<>("Resep telah dihapus!", HttpStatus.OK);
+    }
+
+    //update resep by id
+    @PutMapping("/resep/{id}")
+    public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
+        Optional<RecipeModel> recipeData = RecipeRepository.findById(id);
+
+        if (recipeData.isPresent()) {
+            RecipeModel _recipeModel = recipeData.get();
+            _recipeModel.setId(recipeModel.getId());
+            _recipeModel.setHowto(recipeModel.getHowto());
+            _recipeModel.setIngredients(recipeModel.getIngredients());
+            _recipeModel.setName(recipeModel.getName());
+            _recipeModel.setPublik(recipeModel.getPublik());
+            _recipeModel.setUserid(recipeModel.getUserid());
+            return new ResponseEntity<>(RecipeRepository.save(_recipeModel), HttpStatus.OK);
+        } else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }
