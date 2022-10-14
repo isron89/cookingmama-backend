@@ -103,10 +103,15 @@ public class RecipeController {
         System.out.println(recipeModel.getName());
             //cek name kosong
         if(recipeModel.getName() == null || recipeModel.getName().isEmpty()) {
-            return new ResponseEntity<>("Nama resep tidak boleh kosong", HttpStatus.INTERNAL_SERVER_ERROR);
-            //cek ingredients kosong
-        } else if (recipeModel.getIngredients().isEmpty()) {
-            return new ResponseEntity<>("Bahan-bahan tidak boleh kosong", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Recipe name can't be empty", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        //cek ingredients kosong
+        else if (recipeModel.getIngredients() == null || recipeModel.getIngredients().isEmpty()) {
+            return new ResponseEntity<>("Ingredients can't be empty", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        //cek How to Cook kosong
+        else if (recipeModel.getHowto() == null || recipeModel.getHowto().isEmpty()) {
+            return new ResponseEntity<>("Steps can't be empty", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             try{
                 RecipeModel recipe = RecipeRepository.save(new RecipeModel(recipeModel.getName(), recipeModel.getIngredients(), recipeModel.getHowto(), recipeModel.getPublik(), recipeModel.getUserid()));
@@ -115,34 +120,33 @@ public class RecipeController {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
-
     }
 
     //delete resep by id
-    @DeleteMapping("/resep/{id}")
+    @DeleteMapping("/resep/delete/{id}")
     public ResponseEntity<String> deleteRecipe(@PathVariable("id")long id){
         RecipeRepository.deleteById(id);
         return new ResponseEntity<>("Resep telah dihapus!", HttpStatus.OK);
     }
 
     //update resep by id
-    @PutMapping("/resep/{id}")
+    @PostMapping ("/resep/update/{id}")
+    //@RequestMapping(value = "/resep/update/{id}", method = RequestMethod.POST)
     public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
         Optional<RecipeModel> recipeData = RecipeRepository.findById(id);
+        System.out.println(recipeData);
 
         if (recipeData.isPresent()) {
             RecipeModel _recipeModel = recipeData.get();
-            _recipeModel.setId(recipeModel.getId());
+            //_recipeModel.setId(recipeModel.getId());
             _recipeModel.setHowto(recipeModel.getHowto());
             _recipeModel.setIngredients(recipeModel.getIngredients());
             _recipeModel.setName(recipeModel.getName());
             _recipeModel.setPublik(recipeModel.getPublik());
-            _recipeModel.setUserid(recipeModel.getUserid());
+            //_recipeModel.setUserid(recipeModel.getUserid());
             return new ResponseEntity<>(RecipeRepository.save(_recipeModel), HttpStatus.OK);
         } else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
 }
