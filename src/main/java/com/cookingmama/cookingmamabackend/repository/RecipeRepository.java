@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8080")
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     List<RecipeModel> findByName(String name);
     List<RecipeModel> findByUserid(long userid);

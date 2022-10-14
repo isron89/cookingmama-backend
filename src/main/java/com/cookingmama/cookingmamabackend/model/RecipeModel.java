@@ -34,6 +34,7 @@ public class RecipeModel {
     }
     //long id, String name, String ingredients, String recipeModelName, Boolean publik, String userid
     public RecipeModel(String name, String ingredients, String howto, Boolean publik, String userid) {
+
         this.name = name;
         this.ingredients = ingredients;
         this.howto = howto;

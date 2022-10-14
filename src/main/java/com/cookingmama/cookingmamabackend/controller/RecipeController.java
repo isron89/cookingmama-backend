@@ -15,15 +15,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api")
+
+
+
 public class RecipeController {
 
     @Autowired
     RecipeRepository RecipeRepository;
+
+    private RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping({"","/","/index"})
     public JsonNode index() throws JsonParseException, IOException {
@@ -65,11 +71,53 @@ public class RecipeController {
         }
     }
 
-//    @PostMapping(value = "/resep/create")
-//    public RecipeModel postRecipe(@RequestBody RecipeModel recipeModel){
-//        RecipeModel _resipeModel = RecipeRepository.save(new RecipeModel(recipeModel.getId(), recipeModel.getHowto(), recipeModel.getIngredients(), recipeModel.getName(), recipeModel.getPublik(), recipeModel.getUserid()));
-//        return _resipeModel;
+//    @GetMapping("/save")
+//    private String getOrder(@RequestParam(value = "productId", defaultValue = "Kosong") String id,
+//                            @RequestParam(value = "buyerNama") String buyerNama,
+//                            @RequestParam(value = "address") String address){
+////        System.out.println(orderItem);
+//        if(id.equals("Kosong")) {
+//            return "Product ID tidak boleh kosong";
+//        }
+//        String url = "http://localhost:8080/api/products/" + id;
+//        String result = restTemplate.getForObject(url, String.class);
+//        RecipeModel recipeModel = restTemplate.getForObject(url, RecipeModel.class);
+//        System.out.println("Order success: " + result);
+//
+//        if (result.isEmpty()) {
+//            System.out.println("Gagal menyimpan karena data kosong");
+//        } else {
+//            orderModel orderModel = new orderModel();
+//            orderModel.setOrderid(formatter.format(today) + buyerNama + product.getId());
+//            orderModel.setNama(buyerNama);
+//            orderModel.setOrderdate(formatter.format(today));
+//            orderModel.setAddress(address);
+//            orderModel.setProductitem(product.getNama());
+//            orderRepository.save(orderModel);
+//        }
+//        return result;
 //    }
+
+    @PostMapping(value = "/save")
+    public ResponseEntity<String> postRecipe(@RequestBody RecipeModel recipeModel){
+        System.out.println(recipeModel.getName());
+            //cek name kosong
+        if(recipeModel.getName() == null || recipeModel.getName().isEmpty()) {
+            return new ResponseEntity<>("Nama resep tidak boleh kosong", HttpStatus.INTERNAL_SERVER_ERROR);
+            //cek ingredients kosong
+        } else if (recipeModel.getIngredients().isEmpty()) {
+            return new ResponseEntity<>("Bahan-bahan tidak boleh kosong", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            try{
+                RecipeModel recipe = RecipeRepository.save(new RecipeModel(recipeModel.getName(), recipeModel.getIngredients(), recipeModel.getHowto(), recipeModel.getPublik(), recipeModel.getUserid()));
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+
+    }
 
     //delete resep by id
     @DeleteMapping("/resep/{id}")
