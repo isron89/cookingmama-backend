@@ -146,4 +146,14 @@ public class RecipeController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/recipe/search")
+    public ResponseEntity<?> searchProducts(@RequestParam("query") String query){
+        List<RecipeModel> search = RecipeRepository.findByName(query);
+        if (search.isEmpty()){
+            return new ResponseEntity<>("Not Found", HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>(search, HttpStatus.OK);
+        }
+    }
 }
