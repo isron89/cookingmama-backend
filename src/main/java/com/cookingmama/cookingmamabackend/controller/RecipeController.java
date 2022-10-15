@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -123,7 +124,9 @@ public class RecipeController {
     }
 
     //delete resep by id
+
     @DeleteMapping("/resep/delete/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> deleteRecipe(@PathVariable("id")long id){
         RecipeRepository.deleteById(id);
         return new ResponseEntity<>("Resep telah dihapus!", HttpStatus.OK);
@@ -131,6 +134,7 @@ public class RecipeController {
 
     //update resep by id
     @PostMapping ("/resep/update/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     //@RequestMapping(value = "/resep/update/{id}", method = RequestMethod.POST)
     public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
         Optional<RecipeModel> recipeData = RecipeRepository.findById(id);

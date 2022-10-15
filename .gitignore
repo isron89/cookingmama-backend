@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### VS Code ###
-src/main/resources/application.properties
+src/main/resources/application-development.yml
