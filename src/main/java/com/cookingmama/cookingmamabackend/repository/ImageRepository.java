@@ -1,6 +1,6 @@
 package com.cookingmama.cookingmamabackend.repository;
 
-import com.cookingmama.cookingmamabackend.model.ImageModel;
+import com.cookingmama.cookingmamabackend.models.ImageModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,7 +1,6 @@
-package com.cookingmama.cookingmamabackend.model;
+package com.cookingmama.cookingmamabackend.models;
 
 import lombok.Data;
-import org.springframework.context.annotation.EnableMBeanExport;
 
 import javax.persistence.*;
 

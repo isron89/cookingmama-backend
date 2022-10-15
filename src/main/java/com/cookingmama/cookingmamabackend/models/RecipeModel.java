@@ -1,4 +1,4 @@
-package com.cookingmama.cookingmamabackend.model;
+package com.cookingmama.cookingmamabackend.models;
 
 import javax.persistence.*;
 import lombok.Getter;

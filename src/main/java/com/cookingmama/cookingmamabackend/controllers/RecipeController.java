@@ -1,11 +1,11 @@
-package com.cookingmama.cookingmamabackend.controller;
+package com.cookingmama.cookingmamabackend.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.cookingmama.cookingmamabackend.model.RecipeModel;
+import com.cookingmama.cookingmamabackend.models.RecipeModel;
 import com.cookingmama.cookingmamabackend.repository.RecipeRepository;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,17 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api")
-
-
-
 public class RecipeController {
 
     @Autowired
@@ -124,25 +119,15 @@ public class RecipeController {
     }
 
     //delete resep by id
-<<<<<<< HEAD
-
-    @DeleteMapping("/resep/delete/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-=======
     @DeleteMapping("/recipe/delete/{id}")
->>>>>>> 511dab0dfd54c6e5a4bc76718f708900a52b63ac
     public ResponseEntity<String> deleteRecipe(@PathVariable("id")long id){
         RecipeRepository.deleteById(id);
         return new ResponseEntity<>("Recipe has been deleted!", HttpStatus.OK);
     }
 
     //update resep by id
-<<<<<<< HEAD
-    @PostMapping ("/resep/update/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-=======
+
     @PostMapping ("/recipe/update/{id}")
->>>>>>> 511dab0dfd54c6e5a4bc76718f708900a52b63ac
     //@RequestMapping(value = "/resep/update/{id}", method = RequestMethod.POST)
     public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
         Optional<RecipeModel> recipeData = RecipeRepository.findById(id);

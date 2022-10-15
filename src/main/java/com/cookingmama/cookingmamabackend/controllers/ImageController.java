@@ -1,7 +1,7 @@
-package com.cookingmama.cookingmamabackend.controller;
+package com.cookingmama.cookingmamabackend.controllers;
 
 
-import com.cookingmama.cookingmamabackend.model.ImageModel;
+import com.cookingmama.cookingmamabackend.models.ImageModel;
 import com.cookingmama.cookingmamabackend.repository.ImageRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Optional;
