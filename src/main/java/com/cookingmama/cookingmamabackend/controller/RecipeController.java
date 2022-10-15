@@ -34,21 +34,21 @@ public class RecipeController {
 
     @GetMapping({"","/","/index"})
     public JsonNode index() throws JsonParseException, IOException {
-        String indexString = "{\"pesan\":\"Welcome to Cooking Mama Backend Service\"}";
+        String indexString = "{\"Message\":\"Welcome to Cooking Mama Backend Service\"}";
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode welcome = mapper.readTree(indexString);
         return welcome;
     }
 
-    @GetMapping("/resep")
-    public ResponseEntity<List<RecipeModel>> getAllRecipes() {
+    @GetMapping("/recipe")
+    public ResponseEntity<?> getAllRecipes() {
         try {
 //            List<RecipeModel> recipes= RecipeRepository.findAll();
             List<RecipeModel> recipes = new ArrayList<RecipeModel>();
             RecipeRepository.findAll().forEach(recipes::add);
             if (recipes.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                return new ResponseEntity<>("There is no recipe yet", HttpStatus.OK);
             }
             return new ResponseEntity<>(recipes, HttpStatus.OK);
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class RecipeController {
         }
     }
 
-    @GetMapping("/resep/{id}")
+    @GetMapping("/recipe/{id}")
     public ResponseEntity<RecipeModel> getProductById(@PathVariable("id") long id) {
         try {
             Optional<RecipeModel> recipesData = RecipeRepository.findById(id);
@@ -124,17 +124,25 @@ public class RecipeController {
     }
 
     //delete resep by id
+<<<<<<< HEAD
 
     @DeleteMapping("/resep/delete/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+=======
+    @DeleteMapping("/recipe/delete/{id}")
+>>>>>>> 511dab0dfd54c6e5a4bc76718f708900a52b63ac
     public ResponseEntity<String> deleteRecipe(@PathVariable("id")long id){
         RecipeRepository.deleteById(id);
-        return new ResponseEntity<>("Resep telah dihapus!", HttpStatus.OK);
+        return new ResponseEntity<>("Recipe has been deleted!", HttpStatus.OK);
     }
 
     //update resep by id
+<<<<<<< HEAD
     @PostMapping ("/resep/update/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+=======
+    @PostMapping ("/recipe/update/{id}")
+>>>>>>> 511dab0dfd54c6e5a4bc76718f708900a52b63ac
     //@RequestMapping(value = "/resep/update/{id}", method = RequestMethod.POST)
     public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
         Optional<RecipeModel> recipeData = RecipeRepository.findById(id);
