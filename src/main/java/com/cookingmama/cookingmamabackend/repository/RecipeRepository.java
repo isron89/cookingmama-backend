@@ -2,6 +2,7 @@ package com.cookingmama.cookingmamabackend.repository;
 
 import com.cookingmama.cookingmamabackend.model.RecipeModel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
@@ -10,5 +11,9 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     List<RecipeModel> findByName(String name);
     List<RecipeModel> findByUserid(long userid);
+
+//    List<RecipeModel> searchRecipe(String query);
+//    @Query("SELECT * FROM recipes WHERE recipes.\"name\" LIKE CONCAT('%',:query, '%')" )
+//    List<RecipeModel> searchRecipe(String query);
 }
 
