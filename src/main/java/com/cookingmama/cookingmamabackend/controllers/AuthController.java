@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +103,8 @@ public class AuthController {
       strRoles.forEach(role -> {
         switch (role) {
         case "admin":
+          //String headerAuth = request.getHeader("Authorization");
+          //System.out.println(headerAuth);
           Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
               .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
           roles.add(adminRole);

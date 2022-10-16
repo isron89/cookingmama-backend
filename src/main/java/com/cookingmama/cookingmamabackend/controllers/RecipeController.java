@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import com.cookingmama.cookingmamabackend.models.RecipeModel;
 import com.cookingmama.cookingmamabackend.repository.RecipeRepository;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -14,17 +16,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/recipe")
 public class RecipeController {
-
     @Autowired
     RecipeRepository RecipeRepository;
-
     private RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping({"","/","/index"})
@@ -36,7 +35,8 @@ public class RecipeController {
         return welcome;
     }
 
-    @GetMapping("/recipe")
+    @GetMapping("/recipes")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllRecipes() {
         try {
 //            List<RecipeModel> recipes= RecipeRepository.findAll();
@@ -51,7 +51,8 @@ public class RecipeController {
         }
     }
 
-    @GetMapping("/recipe/{id}")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<RecipeModel> getProductById(@PathVariable("id") long id) {
         try {
             Optional<RecipeModel> recipesData = RecipeRepository.findById(id);
@@ -95,6 +96,7 @@ public class RecipeController {
 //    }
 
     @PostMapping(value = "/save")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postRecipe(@RequestBody RecipeModel recipeModel){
         System.out.println(recipeModel.getName());
             //cek name kosong
@@ -119,7 +121,8 @@ public class RecipeController {
     }
 
     //delete resep by id
-    @DeleteMapping("/recipe/delete/{id}")
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> deleteRecipe(@PathVariable("id")long id){
         RecipeRepository.deleteById(id);
         return new ResponseEntity<>("Recipe has been deleted!", HttpStatus.OK);
@@ -127,7 +130,8 @@ public class RecipeController {
 
     //update resep by id
 
-    @PostMapping ("/recipe/update/{id}")
+    @PostMapping ("/update/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     //@RequestMapping(value = "/resep/update/{id}", method = RequestMethod.POST)
     public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
         Optional<RecipeModel> recipeData = RecipeRepository.findById(id);
@@ -147,7 +151,8 @@ public class RecipeController {
         }
     }
 
-    @GetMapping("/recipe/search")
+    @GetMapping("/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> searchProducts(@RequestParam("query") String query){
         List<RecipeModel> search = RecipeRepository.findByName(query);
         if (search.isEmpty()){
