@@ -43,9 +43,50 @@ public class RecipeController {
             List<RecipeModel> recipes = new ArrayList<RecipeModel>();
             RecipeRepository.findAll().forEach(recipes::add);
             if (recipes.isEmpty()) {
-                return new ResponseEntity<>("There is no recipe yet", HttpStatus.OK);
+                String indexString = "{\"Message\":\"There is no recipe yet\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode noRecipe = mapper.readTree(indexString);
+                return new ResponseEntity<>(noRecipe, HttpStatus.OK);
             }
             return new ResponseEntity<>(recipes, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/public")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getPublicRecipes() {
+        try {
+//            List<RecipeModel> recipes= RecipeRepository.findAll();
+            List<RecipeModel> recipesPublic = new ArrayList<RecipeModel>();
+            RecipeRepository.findByPublikTrue().forEach(recipesPublic::add);
+            if (recipesPublic.isEmpty()) {
+                String indexString = "{\"Message\":\"There is no public recipe\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode noRecipe = mapper.readTree(indexString);
+                return new ResponseEntity<>(noRecipe, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(recipesPublic, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/private")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getPrivateRecipes() {
+        try {
+//            List<RecipeModel> recipes= RecipeRepository.findAll();
+            List<RecipeModel> recipesPrivate = new ArrayList<RecipeModel>();
+            RecipeRepository.findByPublikFalse().forEach(recipesPrivate::add);
+            if (recipesPrivate.isEmpty()) {
+                String indexString = "{\"Message\":\"You have not created a recipe\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode noRecipe = mapper.readTree(indexString);
+                return new ResponseEntity<>(noRecipe, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(recipesPrivate, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }

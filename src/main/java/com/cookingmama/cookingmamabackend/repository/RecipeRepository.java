@@ -11,6 +11,8 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     List<RecipeModel> findByName(String name);
     List<RecipeModel> findByUserid(long userid);
+    List<RecipeModel> findByPublikTrue();
+    List<RecipeModel> findByPublikFalse();
 
 //    List<RecipeModel> searchRecipe(String query);
 //    @Query("SELECT * FROM recipes WHERE recipes.\"name\" LIKE CONCAT('%',:query, '%')" )
