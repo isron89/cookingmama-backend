@@ -81,7 +81,7 @@ public class RecipeController {
             List<RecipeModel> recipesPrivate = new ArrayList<RecipeModel>();
             RecipeRepository.findByPublikFalse().forEach(recipesPrivate::add);
             if (recipesPrivate.isEmpty()) {
-                String indexString = "{\"Message\":\"You have not created a recipe\"}";
+                String indexString = "{\"Message\":\"You have not created a recipe yet\"}";
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode noRecipe = mapper.readTree(indexString);
                 return new ResponseEntity<>(noRecipe, HttpStatus.OK);
@@ -195,9 +195,17 @@ public class RecipeController {
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> searchProducts(@RequestParam("query") String query){
-        List<RecipeModel> search = RecipeRepository.findByName(query);
+        List<RecipeModel> search = RecipeRepository.findByNameContaining(query);
         if (search.isEmpty()){
-            return new ResponseEntity<>("Not Found", HttpStatus.INTERNAL_SERVER_ERROR);
+            try {
+                String indexString = "{\"Message\":\"Not Found\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode notFound = mapper.readTree(indexString);
+                return new ResponseEntity<>(notFound, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+//            return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             return new ResponseEntity<>(search, HttpStatus.OK);
         }
