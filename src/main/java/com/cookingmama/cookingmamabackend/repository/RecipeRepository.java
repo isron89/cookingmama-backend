@@ -9,8 +9,9 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
-    List<RecipeModel> findByName(String name);
-    List<RecipeModel> findByUserid(long userid);
+//    List<RecipeModel> findByName(String name);
+    List<RecipeModel> findByNameContaining(String name);
+    List<RecipeModel> findByUserid(String userid);
     List<RecipeModel> findByPublikTrue();
     List<RecipeModel> findByPublikFalse();
 

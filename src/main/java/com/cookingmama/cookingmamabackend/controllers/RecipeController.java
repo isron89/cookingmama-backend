@@ -80,7 +80,7 @@ public class RecipeController {
             List<RecipeModel> recipesPrivate = new ArrayList<RecipeModel>();
             RecipeRepository.findByPublikFalse().forEach(recipesPrivate::add);
             if (recipesPrivate.isEmpty()) {
-                String indexString = "{\"Message\":\"You have not created a recipe\"}";
+                String indexString = "{\"Message\":\"You have no private recipe\"}";
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode noRecipe = mapper.readTree(indexString);
                 return new ResponseEntity<>(noRecipe, HttpStatus.OK);
@@ -89,6 +89,45 @@ public class RecipeController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/myrecipes/{userid}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getMyRecipes(@PathVariable("userid") String userid) {
+        List<RecipeModel> myRecipes = RecipeRepository.findByUserid(userid);
+        if (myRecipes.isEmpty()){
+            try {
+                String indexString = "{\"Message\":\"You have not created a recipe yet\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode notFound = mapper.readTree(indexString);
+                return new ResponseEntity<>(notFound, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(myRecipes, HttpStatus.OK);
+        }
+//        try {
+//            List<RecipeModel> myRecipes = RecipeRepository.findByUserid(uid);
+
+//            return myRecipes.isPresent() ? new ResponseEntity<>(myRecipes.get(), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//            List<RecipeModel> myRecipes = new ArrayList<RecipeModel>();
+//            RecipeRepository.findByUserid(uid).forEach(myRecipes::add);
+
+//            List<RecipeModel> myRecipes = new ArrayList<RecipeModel>();
+//            RecipeRepository.findByUserid(userid).forEach(myRecipes::add);
+//            System.out.println("masukk");
+//            if (myRecipes.isEmpty()) {
+//                String indexString = "{\"Message\":\"You have not created a recipe yet\"}";
+//                ObjectMapper mapper = new ObjectMapper();
+//                JsonNode noRecipe = mapper.readTree(indexString);
+//                return new ResponseEntity<>(noRecipe, HttpStatus.OK);
+//            }
+//            return new ResponseEntity<>(myRecipes, HttpStatus.OK);
+//        } catch (Exception e) {
+//
+//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
     }
 
     @GetMapping("/{id}")
@@ -193,9 +232,17 @@ public class RecipeController {
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> searchProducts(@RequestParam("query") String query){
-        List<RecipeModel> search = RecipeRepository.findByName(query);
+        List<RecipeModel> search = RecipeRepository.findByNameContaining(query);
         if (search.isEmpty()){
-            return new ResponseEntity<>("Not Found", HttpStatus.INTERNAL_SERVER_ERROR);
+            try {
+                String indexString = "{\"Message\":\"Not Found\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode notFound = mapper.readTree(indexString);
+                return new ResponseEntity<>(notFound, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+//            return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             return new ResponseEntity<>(search, HttpStatus.OK);
         }
