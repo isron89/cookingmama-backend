@@ -55,7 +55,6 @@ public class RecipeController {
     }
 
     @GetMapping("/public")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getPublicRecipes() {
         try {
 //            List<RecipeModel> recipes= RecipeRepository.findAll();
@@ -93,7 +92,6 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<RecipeModel> getProductById(@PathVariable("id") long id) {
         try {
             Optional<RecipeModel> recipesData = RecipeRepository.findById(id);
@@ -137,7 +135,7 @@ public class RecipeController {
 //    }
 
     @PostMapping(value = "/save")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postRecipe(@RequestBody RecipeModel recipeModel){
         System.out.println(recipeModel.getName());
             //cek name kosong
@@ -154,7 +152,7 @@ public class RecipeController {
         } else {
             try{
                 RecipeModel recipe = RecipeRepository.save(new RecipeModel(recipeModel.getName(), recipeModel.getIngredients(), recipeModel.getHowto(), recipeModel.getPublik(), recipeModel.getUserid()));
-                return new ResponseEntity<>("Success", HttpStatus.OK);
+                return new ResponseEntity<>(null, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }

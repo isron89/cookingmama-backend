@@ -3,6 +3,7 @@ package com.cookingmama.cookingmamabackend.models;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 @Setter
 @Getter
@@ -17,9 +18,11 @@ public class RecipeModel {
     private String name;
 
     @Column(name = "ingredients")
+    @Length(max=2000)
     private String ingredients;
 
     @Column(name = "howto")
+    @Length(max=4000)
     private String howto;
 
     @Column(name = "publik")
