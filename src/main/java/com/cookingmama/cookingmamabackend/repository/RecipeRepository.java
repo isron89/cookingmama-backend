@@ -11,8 +11,7 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
 //    List<RecipeModel> findByName(String name);
     List<RecipeModel> findByNameContaining(String name);
-
-    List<RecipeModel> findByUserid(long userid);
+    List<RecipeModel> findByUserid(String userid);
     List<RecipeModel> findByPublikTrue();
     List<RecipeModel> findByPublikFalse();
 
