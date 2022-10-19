@@ -5,7 +5,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.cookingmama.cookingmamabackend.models.CommentModel;
 import com.cookingmama.cookingmamabackend.repository.CommentRepository;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,8 +25,8 @@ public class CommentController {
     @PostMapping(value = "/postcomment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postComment(@RequestBody CommentModel commentModel){
-        System.out.println(commentModel.getText());
-        //cek name kosong
+//        System.out.println(commentModel.getText());
+        //cek comment kosong
         if(commentModel.getText() == null || commentModel.getText().isEmpty()) {
             return new ResponseEntity<>("Comment can't be empty", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
