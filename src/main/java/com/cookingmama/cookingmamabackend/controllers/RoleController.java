@@ -25,8 +25,12 @@ public class RoleController {
             Role role2 = new Role();
             role2.setName(ERole.ROLE_ADMIN);
 
+            Role role3 = new Role();
+            role3.setName(ERole.ROLE_MODERATOR);
+
             roleRepository.save(role1);
             roleRepository.save(role2);
+            roleRepository.save(role3);
         }
     }
 }

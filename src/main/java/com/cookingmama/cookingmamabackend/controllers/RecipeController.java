@@ -2,6 +2,7 @@ package com.cookingmama.cookingmamabackend.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class RecipeController {
 
     //AllRecipeByAdmin
     @GetMapping("/recipes")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllRecipes() {
         try {
             List<Recipe> recipes = new ArrayList<Recipe>();
@@ -60,12 +61,13 @@ public class RecipeController {
         }
     }
 
-    //GetAllPublic -> USE WHEN HAVEN'T SIGN IN
+    //GetAllPublic -> USE WHEN HASN'T SIGNED IN
     @GetMapping("/public")
     public ResponseEntity<?> getPublicRecipes() {
         try {
             List<Recipe> recipesPublic = new ArrayList<Recipe>();
             recipeRepository.findByPublicAccessTrue().forEach(recipesPublic::add);
+            Collections.sort(recipesPublic, (left, right) -> (int) (right.getId() - left.getId()));
             if (recipesPublic.isEmpty()) {
                 String indexString = "{\"Message\":\"There is no public recipe\"}";
                 ObjectMapper mapper = new ObjectMapper();
@@ -78,8 +80,8 @@ public class RecipeController {
         }
     }
 
-    //GetAllPublicRecipe and UserPrivateRecipe
-    @GetMapping("/all")
+    //GetAllPublicRecipe and UserPrivateRecipe -> WHEN USER HAS SIGNED IN
+    @GetMapping("/default")
     public ResponseEntity<?> getPublicRecipes(@RequestParam(name = "userId") String userIdStr) {
         Long userId = Long.parseLong(userIdStr);
         User user = userRepository.findById(userId).orElseThrow();
@@ -88,6 +90,7 @@ public class RecipeController {
             List<Recipe> recipesPublic = new ArrayList<Recipe>();
             recipeRepository.findByPublicAccessTrue().forEach(recipesPublic::add);
             recipeRepository.findByPublicAccessFalseAndUser(user).forEach(recipesPublic::add);
+            Collections.sort(recipesPublic, (left, right) -> (int) (right.getId() - left.getId()));
             if (recipesPublic.isEmpty()) {
                 String indexString = "{\"Message\":\"There is no public recipe\"}";
                 ObjectMapper mapper = new ObjectMapper();
@@ -120,11 +123,12 @@ public class RecipeController {
     }
 
     //GetRecipeByUserId (RESEPKU)
-    @GetMapping("/myrecipes/{userid}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> getMyRecipes(@PathVariable("userid") Long userId) {
+    @GetMapping("/myrecipes")
+    //@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getMyRecipes(@RequestParam("userId") Long userId) {
         User user = userRepository.findById(userId).orElseThrow();
         List<Recipe> myRecipes = recipeRepository.findByUser(user);
+        Collections.sort(myRecipes, (left, right) -> (int) (right.getId() - left.getId()));
         if (myRecipes.isEmpty()){
             try {
                 String indexString = "{\"Message\":\"You have not created a recipe yet\"}";
@@ -159,7 +163,7 @@ public class RecipeController {
 
     //PostNewRecipe
     @PostMapping(value = "/save")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postRecipe(@RequestBody Recipe recipeModel, @RequestParam(name = "userId") Long userId){
         System.out.println(recipeModel.getRecipeName());
         User user = userRepository.findById(userId).orElseThrow();
@@ -239,11 +243,11 @@ public class RecipeController {
         }
     }
 
-    //SearchInMainMenu -> USE WHEN USER HAVEN'T SIGN IN
+    //SearchInMainMenu -> USE WHEN USER HASN'T SIGNED IN (IN HOMEPAGE)
     @GetMapping("/search/public")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> searchProducts(@RequestParam("query") String query){
-        List<Recipe> search = recipeRepository.findByRecipeNameAndPublicAccessTrue(query);
+        List<Recipe> search = recipeRepository.findRecipesByPublicAccessAndRecipeName("%"+query+"%");
         if (search.isEmpty()){
             try {
                 String indexString = "{\"Message\":\"Not Found\"}";
@@ -258,14 +262,11 @@ public class RecipeController {
         }
     }
 
-    //SearchInMainMenu -> USE WHEN USER HAVE SIGN IN
+    //SearchInMainMenu -> USE WHEN USER HAS SIGNED IN (IN HOMEPAGE)
     @GetMapping("/search")
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> searchAllProducts(@RequestParam("query") String query, @RequestParam(name = "userId") Long userId){
-        List<Recipe> search = recipeRepository.findByRecipeNameAndPublicAccessTrue(query);
-
-        User user = userRepository.findById(userId).orElseThrow();
-        recipeRepository.findByRecipeNameAndPublicAccessFalseAndUser(user).forEach(search::add);
+        List<Recipe> search = recipeRepository.findRecipesByUserIdOrPublicAccessTrueAndRecipeName(userId, "%"+query+"%");
         if (search.isEmpty()){
             try {
                 String indexString = "{\"Message\":\"Not Found\"}";
@@ -279,5 +280,26 @@ public class RecipeController {
             return new ResponseEntity<>(search, HttpStatus.OK);
         }
     }
+
+    //
+    @GetMapping("/myrecipes/search")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> searchAllProductsInProfile(@RequestParam("query") String query, @RequestParam(name = "userId") Long userId){
+        List<Recipe> search = recipeRepository.findRecipesByUserIdAndRecipeName(userId,"%"+query+"%");
+
+        if (search.isEmpty()){
+            try {
+                String indexString = "{\"Message\":\"Not Found\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode notFound = mapper.readTree(indexString);
+                return new ResponseEntity<>(notFound, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(search, HttpStatus.OK);
+        }
+    }
+
 
 }
