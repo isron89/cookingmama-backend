@@ -1,9 +1,13 @@
 package com.cookingmama.cookingmamabackend.controllers;
 
+import com.cookingmama.cookingmamabackend.models.Recipe;
+import com.cookingmama.cookingmamabackend.models.User;
+import com.cookingmama.cookingmamabackend.repository.RecipeRepository;
+import com.cookingmama.cookingmamabackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import com.cookingmama.cookingmamabackend.models.CommentModel;
+import com.cookingmama.cookingmamabackend.models.Comment;
 import com.cookingmama.cookingmamabackend.repository.CommentRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,19 +23,29 @@ import java.util.List;
 @RequestMapping("/comment")
 public class CommentController {
     @Autowired
-    CommentRepository CommentRepository;
-    private RestTemplate restTemplate = new RestTemplate();
+    CommentRepository commentRepository;
 
-    @PostMapping(value = "/postcomment")
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    RecipeRepository recipeRepository;
+
+    @PostMapping(value = "/postcomment/id={recipe_id}/userId={user_id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<String> postComment(@RequestBody CommentModel commentModel){
-//        System.out.println(commentModel.getText());
-        //cek comment kosong
-        if(commentModel.getText() == null || commentModel.getText().isEmpty()) {
+    public ResponseEntity<String> postComment(@RequestBody Comment commentModel, @PathVariable(name = "recipe_id") Long recipeId, @PathVariable(name = "user_id") Long userId){
+        if(commentModel.getComment() == null || commentModel.getComment().isEmpty()) {
             return new ResponseEntity<>("Comment can't be empty", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             try {
-                CommentModel comment = CommentRepository.save(new CommentModel(commentModel.getText(), commentModel.getRecipeid(), commentModel.getUserid()));
+                Comment newComment = commentModel;
+                User user = userRepository.findById(userId).orElseThrow();
+                Recipe recipe = recipeRepository.findById(recipeId).orElseThrow();
+
+                newComment.setUser(user);
+                newComment.setRecipe(recipe);
+
+                commentRepository.save(newComment);
                 return new ResponseEntity<>("Success", HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -39,22 +53,23 @@ public class CommentController {
         }
     }
 
-    @GetMapping("/comments/{recipeid}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> getMyRecipes(@PathVariable("recipeid") String recipeid) {
-        List<CommentModel> allComment = CommentRepository.findCommentByRecipeid(recipeid);
-        if (allComment.isEmpty()){
-            try {
-                String indexString = "{\"Message\":\"There is no comment on this recipe\"}";
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode notFound = mapper.readTree(indexString);
-                return new ResponseEntity<>(notFound, HttpStatus.OK);
-            } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return new ResponseEntity<>(allComment, HttpStatus.OK);
-        }
-    }
+//    @GetMapping("/comments/{recipeid}")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    public ResponseEntity<?> getMyRecipes(@PathVariable("recipeid") String recipeName) {
+//        List<Recipe> recipe = recipeRepository.findByRecipeName(recipeName);
+//        List<Comment> allComment = commentRepository.findCommentByRecipeid(recipe.get(0));
+//        if (allComment.isEmpty()){
+//            try {
+//                String indexString = "{\"Message\":\"There is no comment on this recipe\"}";
+//                ObjectMapper mapper = new ObjectMapper();
+//                JsonNode notFound = mapper.readTree(indexString);
+//                return new ResponseEntity<>(notFound, HttpStatus.OK);
+//            } catch (Exception e) {
+//                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        } else {
+//            return new ResponseEntity<>(allComment, HttpStatus.OK);
+//        }
+//    }
 
 }

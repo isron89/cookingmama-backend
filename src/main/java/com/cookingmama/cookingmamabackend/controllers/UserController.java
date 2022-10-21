@@ -23,8 +23,8 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     UserRepository userRepository;
-    private RestTemplate restTemplate = new RestTemplate();
 
+    //Default
     @GetMapping({"","/","/index"})
     public JsonNode index() throws JsonParseException, IOException {
         String indexString = "{\"Message\":\"User Service\"}";
@@ -34,15 +34,16 @@ public class UserController {
         return welcome;
     }
 
+    //GetAllUser
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getAllRecipes() {
+    public ResponseEntity<?> getAllUsers() {
         try {
 //            List<RecipeModel> recipes= RecipeRepository.findAll();
             List<User> users = new ArrayList<User>();
             userRepository.findAll().forEach(users::add);
             if (users.isEmpty()) {
-                return new ResponseEntity<>("There is no recipe yet", HttpStatus.OK);
+                return new ResponseEntity<>("There is no user yet", HttpStatus.OK);
             }
             return new ResponseEntity<>(users, HttpStatus.OK);
         } catch (Exception e) {
@@ -57,11 +58,6 @@ public class UserController {
             Optional<User> userData = userRepository.findById(id);
 
             return userData.isPresent() ? new ResponseEntity<>(userData.get(), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            if (recipesData.isPresent() && recipesData.get().getId() == id) {
-//                return new ResponseEntity<>(recipesData.get(), HttpStatus.OK);
-//            } else {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
