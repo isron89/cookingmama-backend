@@ -41,7 +41,6 @@ public class RecipeController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllRecipes() {
         try {
-//            List<RecipeModel> recipes= RecipeRepository.findAll();
             List<RecipeModel> recipes = new ArrayList<RecipeModel>();
             RecipeRepository.findAll().forEach(recipes::add);
             if (recipes.isEmpty()) {
@@ -59,7 +58,6 @@ public class RecipeController {
     @GetMapping("/public")
     public ResponseEntity<?> getPublicRecipes() {
         try {
-//            List<RecipeModel> recipes= RecipeRepository.findAll();
             List<RecipeModel> recipesPublic = new ArrayList<RecipeModel>();
             RecipeRepository.findByPublikTrue().forEach(recipesPublic::add);
             if (recipesPublic.isEmpty()) {
@@ -78,7 +76,6 @@ public class RecipeController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getPrivateRecipes() {
         try {
-//            List<RecipeModel> recipes= RecipeRepository.findAll();
             List<RecipeModel> recipesPrivate = new ArrayList<RecipeModel>();
             RecipeRepository.findByPublikFalse().forEach(recipesPrivate::add);
             if (recipesPrivate.isEmpty()) {
@@ -109,74 +106,27 @@ public class RecipeController {
         } else {
             return new ResponseEntity<>(myRecipes, HttpStatus.OK);
         }
-//        try {
-//            List<RecipeModel> myRecipes = RecipeRepository.findByUserid(uid);
-
-//            return myRecipes.isPresent() ? new ResponseEntity<>(myRecipes.get(), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            List<RecipeModel> myRecipes = new ArrayList<RecipeModel>();
-//            RecipeRepository.findByUserid(uid).forEach(myRecipes::add);
-
-//            List<RecipeModel> myRecipes = new ArrayList<RecipeModel>();
-//            RecipeRepository.findByUserid(userid).forEach(myRecipes::add);
-//            System.out.println("masukk");
-//            if (myRecipes.isEmpty()) {
-//                String indexString = "{\"Message\":\"You have not created a recipe yet\"}";
-//                ObjectMapper mapper = new ObjectMapper();
-//                JsonNode noRecipe = mapper.readTree(indexString);
-//                return new ResponseEntity<>(noRecipe, HttpStatus.OK);
-//            }
-//            return new ResponseEntity<>(myRecipes, HttpStatus.OK);
-//        } catch (Exception e) {
-//
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<RecipeModel> getProductById(@PathVariable("id") long id) {
         try {
             Optional<RecipeModel> recipesData = RecipeRepository.findById(id);
-
-            return recipesData.isPresent() ? new ResponseEntity<>(recipesData.get(), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            if (recipesData.isPresent() && recipesData.get().getId() == id) {
-//                return new ResponseEntity<>(recipesData.get(), HttpStatus.OK);
-//            } else {
-//                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            }
+            if (recipesData.isEmpty()) {
+                String indexString = "{\"Message\":\"no recipe with this id\"}";
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode wrongId = mapper.readTree(indexString);
+                return new ResponseEntity(wrongId, HttpStatus.OK);
+            } else {
+                return recipesData.isPresent() ? new ResponseEntity<>(recipesData.get(), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-//    @GetMapping("/save")
-//    private String getOrder(@RequestParam(value = "productId", defaultValue = "Kosong") String id,
-//                            @RequestParam(value = "buyerNama") String buyerNama,
-//                            @RequestParam(value = "address") String address){
-////        System.out.println(orderItem);
-//        if(id.equals("Kosong")) {
-//            return "Product ID tidak boleh kosong";
-//        }
-//        String url = "http://localhost:8080/api/products/" + id;
-//        String result = restTemplate.getForObject(url, String.class);
-//        RecipeModel recipeModel = restTemplate.getForObject(url, RecipeModel.class);
-//        System.out.println("Order success: " + result);
-//
-//        if (result.isEmpty()) {
-//            System.out.println("Gagal menyimpan karena data kosong");
-//        } else {
-//            orderModel orderModel = new orderModel();
-//            orderModel.setOrderid(formatter.format(today) + buyerNama + product.getId());
-//            orderModel.setNama(buyerNama);
-//            orderModel.setOrderdate(formatter.format(today));
-//            orderModel.setAddress(address);
-//            orderModel.setProductitem(product.getNama());
-//            orderRepository.save(orderModel);
-//        }
-//        return result;
-//    }
-
     @PostMapping(value = "/save")
-    //@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postRecipe(@RequestBody RecipeModel recipeModel){
         System.out.println(recipeModel.getName());
             //cek name kosong
@@ -212,19 +162,16 @@ public class RecipeController {
 
     @PostMapping ("/update/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    //@RequestMapping(value = "/resep/update/{id}", method = RequestMethod.POST)
     public ResponseEntity<RecipeModel> updateRecipe(@PathVariable("id")long id, @RequestBody RecipeModel recipeModel){
         Optional<RecipeModel> recipeData = RecipeRepository.findById(id);
         System.out.println(recipeData);
 
         if (recipeData.isPresent()) {
             RecipeModel _recipeModel = recipeData.get();
-            //_recipeModel.setId(recipeModel.getId());
             _recipeModel.setHowto(recipeModel.getHowto());
             _recipeModel.setIngredients(recipeModel.getIngredients());
             _recipeModel.setName(recipeModel.getName());
             _recipeModel.setPublik(recipeModel.getPublik());
-            //_recipeModel.setUserid(recipeModel.getUserid());
             return new ResponseEntity<>(RecipeRepository.save(_recipeModel), HttpStatus.OK);
         } else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -232,9 +179,9 @@ public class RecipeController {
     }
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> searchProducts(@RequestParam("query") String query){
-        List<RecipeModel> search = RecipeRepository.findByNameContaining(query);
+        List<RecipeModel> search = RecipeRepository.findByNameContainingAndPublikTrue(query);
         if (search.isEmpty()){
             try {
                 String indexString = "{\"Message\":\"Not Found\"}";
@@ -244,7 +191,6 @@ public class RecipeController {
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
-//            return new ResponseEntity<>("", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
             return new ResponseEntity<>(search, HttpStatus.OK);
         }

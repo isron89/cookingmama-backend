@@ -26,7 +26,7 @@ public class RatingController {
     @PostMapping(value = "/rate")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postRate(@RequestBody RatingModel ratingModel){
-        System.out.println(RatingRepository.countUserRate(ratingModel.getRecipeid(), ratingModel.getUserid()));
+//        System.out.println(RatingRepository.countUserRate(ratingModel.getRecipeid(), ratingModel.getUserid()));
 //        if(RatingRepository.countByUserid(ratingModel.getUserid()) == 0) {
         if(RatingRepository.countUserRate(ratingModel.getRecipeid(), ratingModel.getUserid()) == 0) {
             //cek rating value 1-5
@@ -48,17 +48,19 @@ public class RatingController {
     @GetMapping("/reciperate/{recipeid}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getMyRecipes(@PathVariable("recipeid") String recipeid) {
-        float recipeRating = RatingRepository.getRecipeRating(recipeid);
-        if (recipeRating == 0){
+        System.out.println(RatingRepository.countRate(recipeid));
+        if (RatingRepository.countRate(recipeid) == 0){
+            System.out.println("MASUK BRO");
             try {
                 String indexString = "{\"Message\":\"This recipe have no rating\"}";
                 ObjectMapper mapper = new ObjectMapper();
-                JsonNode notFound = mapper.readTree(indexString);
-                return new ResponseEntity<>(notFound, HttpStatus.OK);
+                JsonNode noRating = mapper.readTree(indexString);
+                return new ResponseEntity<>(noRating, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
+            float recipeRating = RatingRepository.getRecipeRating(recipeid);
             DecimalFormat df = new DecimalFormat();
             df.setMaximumFractionDigits(1);
             return new ResponseEntity<>(df.format(recipeRating), HttpStatus.OK);

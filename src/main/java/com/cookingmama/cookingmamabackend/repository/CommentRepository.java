@@ -8,5 +8,5 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8080")
 public interface CommentRepository extends JpaRepository<CommentModel, Long> {
-    List<CommentModel> findByRecipeid(String recipeid);
+    List<CommentModel> findCommentByRecipeid(String recipeid);
 }

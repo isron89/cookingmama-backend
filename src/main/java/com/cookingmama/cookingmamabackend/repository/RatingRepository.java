@@ -15,4 +15,7 @@ public interface RatingRepository extends JpaRepository<RatingModel,Long> {
 
     @Query(value = "SELECT AVG(rate) FROM rating WHERE recipeid = ?1", nativeQuery=true)
     float getRecipeRating(String recipeid);
+
+    @Query(value = "SELECT COUNT(userid) FROM rating WHERE recipeid = ?1", nativeQuery=true)
+    int countRate(String recipeid);
 }
