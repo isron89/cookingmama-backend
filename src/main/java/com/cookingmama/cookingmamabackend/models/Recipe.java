@@ -5,6 +5,8 @@ import javax.persistence.*;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "recipes")
@@ -15,6 +17,9 @@ public class Recipe {
     private long id;
 
     private String recipeName;
+
+    @Column(nullable = false)
+    private LocalDateTime date;
 
     @Length(max=2000)
     private String ingredients;
@@ -29,4 +34,9 @@ public class Recipe {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @PrePersist
+    private void onCreate(){
+        date = LocalDateTime.now();
+    }
 }
