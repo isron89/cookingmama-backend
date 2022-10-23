@@ -2,6 +2,7 @@ package com.cookingmama.cookingmamabackend.repository;
 
 import com.cookingmama.cookingmamabackend.models.RatingModel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -15,4 +16,10 @@ public interface RatingRepository extends JpaRepository<RatingModel,Long> {
 
     @Query(value = "SELECT AVG(rate) FROM rating WHERE recipeid = ?1", nativeQuery=true)
     float getRecipeRating(String recipeid);
+
+    @Query(value = "SELECT COUNT(userid) FROM rating WHERE recipeid = ?1", nativeQuery=true)
+    int countRate(String recipeid);
+
+    @Query(value = "UPDATE recipes SET rate=?1 WHERE id=?2", nativeQuery=true)
+    void updateRate(float rate, int recipeid);
 }

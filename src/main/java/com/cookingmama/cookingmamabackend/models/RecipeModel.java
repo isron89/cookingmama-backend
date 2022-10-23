@@ -4,6 +4,7 @@ import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.lang.Nullable;
 
 @Setter
 @Getter
@@ -30,8 +31,10 @@ public class RecipeModel {
 
     @Column(name = "userid")
     private String userid;
-//    private String steps;
-//    private String image;
+
+    @Nullable
+    @Column(name = "rate")
+    private float rate;
 
     public RecipeModel() {
     }
@@ -43,6 +46,7 @@ public class RecipeModel {
         this.howto = howto;
         this.publik = publik;
         this.userid = userid;
+        this.rate = 0;
     }
 
     @Override

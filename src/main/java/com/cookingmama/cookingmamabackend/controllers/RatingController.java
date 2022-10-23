@@ -1,5 +1,6 @@
 package com.cookingmama.cookingmamabackend.controllers;
 
+import com.cookingmama.cookingmamabackend.repository.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +22,27 @@ import java.util.List;
 public class RatingController {
     @Autowired
     RatingRepository RatingRepository;
+
+    @Autowired
+    RecipeRepository RecipeRepository;
     private RestTemplate restTemplate = new RestTemplate();
 
     @PostMapping(value = "/rate")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<String> postRate(@RequestBody RatingModel ratingModel){
-        System.out.println(RatingRepository.countUserRate(ratingModel.getRecipeid(), ratingModel.getUserid()));
+//        System.out.println(RatingRepository.countUserRate(ratingModel.getRecipeid(), ratingModel.getUserid()));
 //        if(RatingRepository.countByUserid(ratingModel.getUserid()) == 0) {
         if(RatingRepository.countUserRate(ratingModel.getRecipeid(), ratingModel.getUserid()) == 0) {
             //cek rating value 1-5
             if(ratingModel.getRate() > 0 && ratingModel.getRate() <= 5) {
                 try{
                     RatingModel rate = RatingRepository.save(new RatingModel(ratingModel.getRate(), ratingModel.getRecipeid(), ratingModel.getUserid()));
+                    float newRate = RatingRepository.getRecipeRating(ratingModel.getRecipeid());
+                    System.out.println(newRate);
+//                    System.out.println(ratingModel.getRecipeid());
+                    System.out.println(Long.valueOf(ratingModel.getRecipeid()).longValue());
+                    RecipeRepository.updateRate(newRate, Long.valueOf(ratingModel.getRecipeid()).longValue()); //;
+                    System.out.println("masuk");
                     return new ResponseEntity<>("Success", HttpStatus.OK);
                 } catch (Exception e) {
                     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -46,19 +56,21 @@ public class RatingController {
     }
 
     @GetMapping("/reciperate/{recipeid}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getMyRecipes(@PathVariable("recipeid") String recipeid) {
-        float recipeRating = RatingRepository.getRecipeRating(recipeid);
-        if (recipeRating == 0){
+        System.out.println(RatingRepository.countRate(recipeid));
+        if (RatingRepository.countRate(recipeid) == 0){
+            System.out.println("MASUK BRO");
             try {
                 String indexString = "{\"Message\":\"This recipe have no rating\"}";
                 ObjectMapper mapper = new ObjectMapper();
-                JsonNode notFound = mapper.readTree(indexString);
-                return new ResponseEntity<>(notFound, HttpStatus.OK);
+                JsonNode noRating = mapper.readTree(indexString);
+                return new ResponseEntity<>(noRating, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
+            float recipeRating = RatingRepository.getRecipeRating(recipeid);
             DecimalFormat df = new DecimalFormat();
             df.setMaximumFractionDigits(1);
             return new ResponseEntity<>(df.format(recipeRating), HttpStatus.OK);

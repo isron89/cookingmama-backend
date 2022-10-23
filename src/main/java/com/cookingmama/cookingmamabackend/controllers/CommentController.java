@@ -30,7 +30,7 @@ public class CommentController {
         if(commentModel.getText() == null || commentModel.getText().isEmpty()) {
             return new ResponseEntity<>("Comment can't be empty", HttpStatus.INTERNAL_SERVER_ERROR);
         } else {
-            try{
+            try {
                 CommentModel comment = CommentRepository.save(new CommentModel(commentModel.getText(), commentModel.getRecipeid(), commentModel.getUserid()));
                 return new ResponseEntity<>("Success", HttpStatus.OK);
             } catch (Exception e) {
@@ -42,7 +42,7 @@ public class CommentController {
     @GetMapping("/comments/{recipeid}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> getMyRecipes(@PathVariable("recipeid") String recipeid) {
-        List<CommentModel> allComment = CommentRepository.findByRecipeid(recipeid);
+        List<CommentModel> allComment = CommentRepository.findCommentByRecipeid(recipeid);
         if (allComment.isEmpty()){
             try {
                 String indexString = "{\"Message\":\"There is no comment on this recipe\"}";
