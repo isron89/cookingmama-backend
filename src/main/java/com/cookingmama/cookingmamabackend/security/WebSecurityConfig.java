@@ -89,6 +89,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .authorizeRequests().antMatchers("/api/test/**").permitAll()
         .antMatchers("/api/**").permitAll()
         .antMatchers("/images/**").permitAll()
+        .antMatchers("/comment/**").permitAll()
+        .antMatchers("/rating/**").permitAll()
         .anyRequest().authenticated();
     
     http.authenticationProvider(authenticationProvider());

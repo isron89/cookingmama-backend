@@ -70,6 +70,7 @@ public class RecipeController {
             }
             return new ResponseEntity<>(recipesPublic, HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println("Error server: "+e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
